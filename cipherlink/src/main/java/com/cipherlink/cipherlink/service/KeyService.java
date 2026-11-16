@@ -5,6 +5,9 @@ import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 
+import org.springframework.stereotype.Service;
+
+@Service
 public class KeyService {
 
     private final SecureRandom secureRandom = new SecureRandom();
