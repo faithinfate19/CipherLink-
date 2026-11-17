@@ -1,0 +1,176 @@
+{
+  "info": {
+    "_postman_id": "4eeb3198-0fd2-4fb5-a66a-d20413c3aaf5",
+    "name": "CipherLink Local Demo",
+    "description": "Run FileTransferDemo first and import the generated target/CipherLink-Demo.postman_environment.json. Requests demonstrate public-key registration, key lookup, encrypted file upload, inbox retrieval, and the retired plaintext endpoint.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080"
+    },
+    {
+      "key": "senderId",
+      "value": ""
+    },
+    {
+      "key": "senderRsaPublicKey",
+      "value": ""
+    },
+    {
+      "key": "senderSigningPublicKey",
+      "value": ""
+    },
+    {
+      "key": "recipientId",
+      "value": ""
+    },
+    {
+      "key": "recipientRsaPublicKey",
+      "value": ""
+    },
+    {
+      "key": "recipientSigningPublicKey",
+      "value": ""
+    },
+    {
+      "key": "sendBody",
+      "value": "{}"
+    },
+    {
+      "value": "",
+      "key": "senderAccessToken"
+    },
+    {
+      "value": "",
+      "key": "recipientAccessToken"
+    }
+  ],
+  "item": [
+    {
+      "name": "Register sender keys",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"userId\": \"{{senderId}}\",\n  \"rsaPublicKey\": \"{{senderRsaPublicKey}}\",\n  \"signingPublicKey\": \"{{senderSigningPublicKey}}\",
+  \"accessToken\": \"{{senderAccessToken}}\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": "{{baseUrl}}/api/keys/register",
+        "description": "Idempotent for the same registered keys. Returns SHA-256 public-key fingerprints."
+      }
+    },
+    {
+      "name": "Register recipient keys",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"userId\": \"{{recipientId}}\",\n  \"rsaPublicKey\": \"{{recipientRsaPublicKey}}\",\n  \"signingPublicKey\": \"{{recipientSigningPublicKey}}\",
+  \"accessToken\": \"{{recipientAccessToken}}\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": "{{baseUrl}}/api/keys/register"
+      }
+    },
+    {
+      "name": "Get sender public keys",
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/api/keys/{{senderId}}"
+      }
+    },
+    {
+      "name": "Get recipient public keys",
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/api/keys/{{recipientId}}"
+      }
+    },
+    {
+      "name": "Send signed encrypted file",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "value": "Bearer {{senderAccessToken}}",
+            "key": "Authorization"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{{sendBody}}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": "{{baseUrl}}/api/files/send",
+        "description": "The sender signs the package locally. The server verifies the signature and stores only encrypted content."
+      }
+    },
+    {
+      "name": "Receive recipient inbox",
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/api/files/receive/{{recipientId}}",
+        "header": [
+          {
+            "value": "Bearer {{recipientAccessToken}}",
+            "key": "Authorization"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Confirm plaintext endpoint is retired",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": "{{baseUrl}}/api/messages/encrypt",
+        "description": "Expected response: 410 Gone. Encrypt and sign on the sender device."
+      }
+    }
+  ]
+}
