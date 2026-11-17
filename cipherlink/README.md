@@ -44,6 +44,17 @@ Terminal 2 runs the sample Alice-to-Bob transfer:
 The demo creates throwaway RSA and Ed25519 key pairs, registers only the public keys, encrypts and signs a sample file locally, uploads the package, downloads it as Bob, verifies Alice's signature, decrypts locally, and writes the recovered file under `target/`. Pass a custom file with the optional second argument by adding `-Dspring-boot.run.arguments="http://localhost:8080 C:\path\to\file"`.
 
 To inspect the API in Postman, import `postman/CipherLink.postman_collection.json` and the environment file generated at `target/CipherLink-Demo.postman_environment.json`. The environment contains demo public keys and a signed ciphertext package; it contains no private keys or plaintext.
+## Run in Docker
+
+Requires Docker Desktop or Docker Engine with Compose. From the `cipherlink` folder:
+
+```powershell
+docker compose up --build
+```
+
+The API is available at `http://localhost:8080`; Compose keeps JSON registry and transfer data in the `cipherlink-data` volume. To use another local port, set `CIPHERLINK_PORT`, for example `$env:CIPHERLINK_PORT=8081` before starting Compose. Stop with `Ctrl+C`; run `docker compose down` to remove the container while keeping its data volume.
+
+This prepares a portable container for a VPS or container host. It does not publish a public URL by itself: the host account, DNS/TLS, firewall rules, and persistent storage still need to be configured.
 ## API
 
 ### Register public keys
